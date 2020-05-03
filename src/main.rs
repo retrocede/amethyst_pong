@@ -1,5 +1,6 @@
 use amethyst::{
     core::TransformBundle,
+    input::{InputBundle, StringBindings},
     prelude::*,
     renderer::{
         plugins::{RenderFlat2D, RenderToWindow},
@@ -11,19 +12,27 @@ use amethyst::{
 
 mod pong;
 use crate::pong::Pong;
+mod systems;
 
 fn main() -> amethyst::Result<()> {
     // start logger so we can see errors/warnings/debug while project is running
     amethyst::start_logger(Default::default());
 
-    // get display config path
+    // get config paths
     let app_root = application_root_dir()?;
     let display_config_path = app_root.join("config").join("display.ron");
+    let binding_path = app_root.join("config").join("bindings.ron");
+
+    // setup inputs
+    let input_bundle = InputBundle::<StringBindings>::new()
+        .with_bindings_from_file(binding_path)?;
 
     // basic application setup
     let game_data = GameDataBuilder::default()
         // add transform bundle to track entity positions
         .with_bundle(TransformBundle::new())?
+        .with_bundle(input_bundle)?
+        .with(systems::PaddleSystem, "paddle_system", &["input_system"])
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 // The RenderToWindow plugin provides all the scaffolding to open a window and draw to it.
