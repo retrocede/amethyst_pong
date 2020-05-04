@@ -9,11 +9,13 @@ use amethyst::{
     },
     utils::application_root_dir,
     ui::{RenderUi, UiBundle},
+    audio::AudioBundle,
 };
 
-mod pong;
 use crate::pong::Pong;
+mod pong;
 mod systems;
+mod audio;
 
 fn main() -> amethyst::Result<()> {
     // start logger so we can see errors/warnings/debug while project is running
@@ -34,6 +36,7 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?
+        .with_bundle(AudioBundle::default())?
         .with(systems::PaddleSystem, "paddle_system", &["input_system"])
         .with(systems::MoveBallsSystem, "ball_system", &[])
         .with(systems::BounceSystem, "collision_system", &["paddle_system", "ball_system"])
